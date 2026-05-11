@@ -1,0 +1,43 @@
+services:
+  users-management:
+    url: ${USERS_MANAGEMENT_URL:http://localhost:8090}
+
+spring:
+  cloud:
+    writer-data-source:
+      hikari:
+        poolName: writer
+        maximum-pool-size: 10
+        minimum-idle: 1
+        connection-test-query: 'SELECT 1'
+        connection-init-sql: 'SELECT 1'
+        connection-timeout: 5000
+        max-lifetime: 900000
+        # forgot to close connection, will log level WARN
+        leak-detection-threshold: 700000
+        idle-timeout: 600000
+
+    reader-data-source:
+      hikari:
+        poolName: reader
+        maximum-pool-size: 30
+        minimum-idle: 1
+        connection-test-query: 'SELECT 1'
+        connection-init-sql: 'SELECT 1'
+        connection-timeout: 5000
+        max-lifetime: 900000
+        # forgot to close connection, will log level WARN
+        leak-detection-threshold: 700000
+        idle-timeout: 600000
+
+    migration-data-source:
+      hikari:
+        poolName: migration
+        maximum-pool-size: 2
+        minimum-idle: 0
+        connection-test-query: 'SELECT 1'
+        connection-init-sql: 'SELECT 1'
+        max-lifetime: 900000
+        idle-timeout: 60000
+        # strictest level: executes in serial order
+        transactionIsolation: TRANSACTION_SERIALIZABLE

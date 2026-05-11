@@ -1,0 +1,54 @@
+<configuration>
+    <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
+    <springProfile name="production">
+        <springProperty name="serviceName" source="spring.application.name"/>
+        <property name="stack_trace_exclusions"
+                  value="jdk\.internal\.reflect\.,java\.lang\.reflect\.Method\.invoke,^com\.sun\.,java\.lang\.Thread\.run,java\.util\.concurrent\.ThreadPoolExecutor\.runWorker,^org\.springframework\.cglib\.,^org\.springframework\.aop\.,^org\.apache\.tomcat\.,^org\.apache\.catalina\.,^org\.apache\.coyote\."/>
+        <appender name="jsonConsoleAppender" class="ch.qos.logback.core.ConsoleAppender">
+            <encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
+                <providers>
+                    <pattern>
+                        <pattern>{"name":"${serviceName}"}</pattern>
+                    </pattern>
+                    <timestamp/>
+                    <message>
+                        <fieldName>msg</fieldName>
+                    </message>
+                    <loggerName>
+                        <shortenedLoggerNameLength>20</shortenedLoggerNameLength>
+                    </loggerName>
+                    <logLevel/>
+                    <arguments/>
+                    <mdc>
+                        <excludeMdcKeyName>spanExportable</excludeMdcKeyName>
+                        <excludeMdcKeyName>X-Span-Export</excludeMdcKeyName>
+                        <excludeMdcKeyName>X-B3-SpanId</excludeMdcKeyName>
+                        <excludeMdcKeyName>X-B3-TraceId</excludeMdcKeyName>
+                        <excludeMdcKeyName>X-B3-ParentSpanId</excludeMdcKeyName>
+                    </mdc>
+                    <logstashMarkers/>
+                    <stackTrace>
+                        <throwableConverter class="net.logstash.logback.stacktrace.ShortenedThrowableConverter">
+                            <maxDepthPerThrowable>40</maxDepthPerThrowable>
+                            <maxLength>3000</maxLength>
+                            <shortenedClassNameLength>20</shortenedClassNameLength>
+                            <exclusions>${stack_trace_exclusions}</exclusions>
+                        </throwableConverter>
+                    </stackTrace>
+                    <stackHash>
+                        <exclusions>${stack_trace_exclusions}</exclusions>
+                    </stackHash>
+                </providers>
+            </encoder>
+        </appender>
+        <root level="INFO">
+            <appender-ref ref="jsonConsoleAppender"/>
+        </root>
+    </springProfile>
+    <springProfile name="!production">
+        <include resource="org/springframework/boot/logging/logback/console-appender.xml" />
+        <root level="INFO">
+            <appender-ref ref="CONSOLE" />
+        </root>
+    </springProfile>
+</configuration>

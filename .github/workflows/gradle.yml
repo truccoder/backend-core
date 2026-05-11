@@ -1,0 +1,54 @@
+name: Java build
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    uses: truc3651/github-workflows/.github/workflows/build.yml@master
+    permissions:
+      security-events: write
+      packages: read
+      actions: read
+      contents: read
+
+  publish:
+    # only runs when code is pushed to master
+    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Calculate version number
+        id: version
+        run: |
+          RUN_NUMBER=${{ github.run_number }}
+          
+          PATCH=$((RUN_NUMBER % 100))
+          MINOR=$(( (RUN_NUMBER / 100) % 100 ))
+          MAJOR=$((RUN_NUMBER / 10000))
+          
+          if [ $MAJOR -eq 0 ]; then
+            MAJOR=1
+          fi
+          
+          FULL_VERSION="${MAJOR}.${MINOR}.${PATCH}"
+          
+          echo "version=${FULL_VERSION}" >> $GITHUB_OUTPUT
+          echo "📦 Publishing version: ${FULL_VERSION}"
+
+      - name: Publish to GitHub Packages
+        run: ./gradlew publish -Pversion=${{ steps.version.outputs.version }}
+        env:
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          USERNAME: ${{ github.actor }}
+          TOKEN: ${{ secrets.GITHUB_TOKEN }}
