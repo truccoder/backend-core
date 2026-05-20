@@ -30,14 +30,15 @@ dependencies {
     annotationProcessor 'org.projectlombok:lombok'
     api 'com.fasterxml.jackson.core:jackson-databind'
 
-    // JWT
-    api 'io.jsonwebtoken:jjwt-api:0.12.3'
-    runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.12.3'
-    runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.12.3'
+    // OAuth2 Resource Server (Keycloak JWT validation)
+    api 'org.springframework.boot:spring-boot-starter-oauth2-resource-server'
 
     // AWS
     implementation(platform("software.amazon.awssdk:bom:2.27.21"))
     implementation 'software.amazon.awssdk:secretsmanager'
+
+    // MinIO
+    api 'io.minio:minio:8.5.14'
 
     // Commons lang
     implementation("org.apache.commons:commons-lang3:3.20.0")

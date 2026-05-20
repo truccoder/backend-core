@@ -12,4 +12,6 @@ import lombok.experimental.SuperBuilder;
 public class UserDto {
   private String id;
   private String email;
+  private String fullName;
+  private String profilePictureUrl;
 }
